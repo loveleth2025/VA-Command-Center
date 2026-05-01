@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>VA Command | Portal</title>
-<link href="[https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500&display=swap](https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500&display=swap)" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #0a0a0f; --bg2: #111118; --bg3: #18181f; --bg4: #1e1e28;
@@ -18,29 +18,27 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 /* LOGIN OVERLAY */
 #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-card { width: 100%; max-width: 320px; text-align: center; }
-.login-card h1 { font-family: 'Syne'; margin-bottom: 8px; font-size: 28px; letter-spacing: -1px; }
+.login-card h1 { font-family: 'Syne'; margin-bottom: 8px; font-size: 24px; }
 .login-card p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
 
 /* APP LAYOUT */
 .app { display: none; flex-direction: column; height: 100vh; }
 .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
 .content { flex: 1; overflow-y: auto; padding: 16px 16px 100px; }
+.page { display: none; }
+.page.active { display: block; }
 
 /* UI COMPONENTS */
 .card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 12px; }
-.inp { width: 100%; background: var(--bg4); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; color: #fff; outline: none; margin-bottom: 10px; font-size: 16px; border: 1px solid transparent; transition: 0.3s; }
-.inp:focus { border-color: var(--accent); }
-.btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: var(--r); font-weight: 600; cursor: pointer; transition: 0.2s; }
-.btn:active { transform: scale(0.98); opacity: 0.9; }
-
-.task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); animation: slideIn 0.3s ease; }
-@keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.task-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; flex-shrink: 0; }
+.inp { width: 100%; background: var(--bg4); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; color: #fff; outline: none; margin-bottom: 10px; font-size: 16px; }
+.btn { width: 100%; background: var(--accent); color: #fff; border: none; padding: 14px; border-radius: var(--r); font-weight: 600; cursor: pointer; }
+.task-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.task-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; }
 .task-check.done { background: var(--accent3); border-color: var(--accent3); }
 .task-text.done { text-decoration: line-through; color: var(--muted); }
 
 .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--bg2); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0 env(safe-area-inset-bottom); }
-.nav-btn { background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.nav-btn { background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; }
 .nav-btn.active { color: var(--accent2); }
 </style>
 </head>
@@ -48,69 +46,54 @@ body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-s
 
 <div id="login-screen">
   <div class="login-card">
-    <div style="font-size: 40px; margin-bottom: 10px;">⚡</div>
-    <h1>VA COMMAND</h1>
-    <p>Please enter your authorized passkey</p>
-    <input type="text" id="client-key" class="inp" placeholder="Passkey...">
-    <button class="btn" onclick="login()">Enter Portal</button>
-    <div id="error-msg" style="color: var(--red); font-size: 12px; margin-top: 10px; display: none;">Invalid Passkey. Please try again.</div>
+    <h1>VA Command</h1>
+    <p>Enter your Client Access Key</p>
+    <input type="text" id="client-key" class="inp" placeholder="Client Name or ID...">
+    <button class="btn" onclick="login()">Access Portal</button>
   </div>
 </div>
 
 <div class="app" id="main-app">
   <div class="topbar">
-    <div style="font-family:'Syne'; font-size: 18px;">VA <span id="display-client" style="color:var(--accent2)"></span></div>
-    <button onclick="logout()" style="background:rgba(248,113,113,0.1); border:none; color:var(--red); padding: 6px 12px; border-radius: 8px; font-size:11px; font-weight: 600;">Logout</button>
+    <div style="font-family:'Syne'">VA <span id="display-client" style="color:var(--accent2)"></span></div>
+    <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:11px;">Logout</button>
   </div>
 
   <div class="content">
-    <div class="card">
-        <div style="font-size: 12px; color: var(--muted); margin-bottom: 10px; font-weight: 600; text-transform: uppercase;">Command Input</div>
-        <input type="text" id="task-inp" class="inp" placeholder="What needs to be done?">
+    <div class="page active" id="page-tasks">
+      <div class="card">
+        <input type="text" id="task-inp" class="inp" placeholder="New task...">
         <button class="btn" onclick="addTask()">Add Task</button>
+      </div>
+      <div id="task-list"></div>
     </div>
-    <div id="task-list"></div>
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active">
-        <span style="font-size: 18px;">📋</span>
-        Tasks
-    </button>
-    <button class="nav-btn" onclick="alert('Resources & Automation coming soon!')">
-        <span style="font-size: 18px;">🚀</span>
-        Tools
-    </button>
+    <button class="nav-btn active" onclick="goTo('tasks')">Tasks</button>
+    <button class="nav-btn" onclick="alert('Client settings coming soon!')">Settings</button>
   </nav>
 </div>
 
 <script>
-// --- CONFIGURATION ---
-const ALLOWED_KEYS = ["natalie", "tabskie", "tenacity", "admin"]; 
-// ---------------------
-
 let currentClient = "";
 let tasks = [];
 
+// 1. LOGIN LOGIC: Separates data by Client Key
 function login() {
-    const keyInput = document.getElementById('client-key');
-    const key = keyInput.value.trim().toLowerCase();
-    const error = document.getElementById('error-msg');
+    const key = document.getElementById('client-key').value.trim().toLowerCase();
+    if (!key) return alert("Please enter a key");
     
-    if (ALLOWED_KEYS.includes(key)) {
-        currentClient = key;
-        error.style.display = 'none';
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'flex';
-        document.getElementById('display-client').innerText = key === 'admin' ? 'MASTER' : key.toUpperCase();
-        loadTasks();
-    } else {
-        error.style.display = 'block';
-        keyInput.value = '';
-    }
+    currentClient = key;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+    document.getElementById('display-client').innerText = key.toUpperCase();
+    
+    loadTasks();
 }
 
 function loadTasks() {
+    // Use the client key as the storage name so they don't see other clients' data
     const saved = localStorage.getItem('tasks_' + currentClient);
     tasks = saved ? JSON.parse(saved) : [];
     render();
@@ -141,21 +124,17 @@ function deleteTask(id) {
 
 function render() {
     const list = document.getElementById('task-list');
-    if(tasks.length === 0) {
-        list.innerHTML = '<div style="text-align:center; color:var(--muted); margin-top:40px; font-size:14px;">No tasks for today. <br> Add one above!</div>';
-        return;
-    }
     list.innerHTML = tasks.map(t => `
         <div class="task-item">
             <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})"></div>
             <div class="task-text ${t.done ? 'done' : ''}" style="flex:1">${t.text}</div>
-            <div onclick="deleteTask(${t.id})" style="color:var(--red); font-size:24px; padding: 0 10px; cursor:pointer;">×</div>
+            <div onclick="deleteTask(${t.id})" style="color:var(--red); font-size:18px">×</div>
         </div>
     `).join('');
 }
 
 function logout() {
-    location.reload();
+    location.reload(); // Returns to login screen
 }
 </script>
 </body>
