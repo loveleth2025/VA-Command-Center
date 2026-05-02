@@ -1,397 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<meta name="theme-color" content="#0a0a0f" />
-<title>Unified VA Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-title" content="Client Portal">
+<link rel="apple-touch-icon" sizes="192x192" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMyRDUwMTYiLz4KPHRleHQgeD0iOTYiIHk9IjExMiIgZm9udC1mYW1pbHk9IkZyaHVtY2VzLCBzZXJpZiIgZm9udC1zaXplPSI2NCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QQVJUT0w8L3RleHQ+Cjwvc3ZnPg==">
+<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkNsaWVudCBQb3J0YWwiLAogICJzaG9ydF9uYW1lIjogIlBvcnRhbCIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZmFmYWY4IiwKICAidGhlbWVfY29sb3IiOiAiIzJkNTAxNiIKfQ==">
+<title>Client Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-:root{
-  --bg:#0a0a0f;--bg2:#111118;--bg3:#18181f;--bg4:#1e1e28;
-  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
-  --text:#f0f0f5;--muted:#6b6b80;--accent:#7c6af7;--accent2:#a78bfa;
-  --accent3:#38d9a9;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;
-  --green:#34d399;--pink:#f472b6;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
-  --r:14px;--r2:20px;--safe-bottom:env(safe-area-inset-bottom,0px);
+:root {
+  --bg: #fafaf8; --bg2: #ffffff; --bg3: #f4f3ef; --bg4: #eeede8;
+  --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.12);
+  --text: #1a1a18; --muted: #7a7a72; --muted2: #aeada6;
+  --accent: #2d5016; --accent-light: #eaf2e3; --accent2: #4a7c2f;
+  --gold: #8b6914; --gold-light: #fdf4dc; --red: #c0392b; --red-light: #fdf0ee;
+  --blue: #1a4a7a; --blue-light: #eaf0f8;
+  --font-head: 'Fraunces', serif; --font-body: 'Plus Jakarta Sans', sans-serif;
+  --r: 12px; --r2: 18px; --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);overflow:hidden}
-.app{display:flex;flex-direction:column;height:100vh;height:100dvh}
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.app-logo{font-family:var(--font-head);font-size:17px;font-weight:700;letter-spacing:-.3px}
-.app-logo span{color:var(--accent2)}
-.topbar-date{font-size:11px;color:var(--muted)}
-.btn-icon{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text)}
-.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.page{display:none;padding:16px 16px 90px}
-.page.active{display:block}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);z-index:100}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;gap:4px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);cursor:pointer}
-.nav-btn.active{color:var(--accent2)}
-.nav-btn svg{width:22px;height:22px}
-.nav-label{font-size:10px;font-weight:500;letter-spacing:.3px}
-.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:12px}
-.card-title{font-family:var(--font-head);font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.stat-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;position:relative;overflow:hidden}
-.stat-num{font-family:var(--font-head);font-size:26px;font-weight:700;margin-bottom:2px}
-.stat-lbl{font-size:11px;color:var(--muted)}
-.purple .stat-num{color:var(--accent2)} .teal .stat-num{color:var(--accent3)}
-.amber .stat-num{color:var(--amber)} .blue .stat-num{color:var(--blue)}
-.purple::before,.teal::before,.amber::before,.blue::before{content:'';position:absolute;top:-20px;right:-20px;width:60px;height:60px;border-radius:50%;opacity:.07}
-.purple::before{background:var(--accent)} .teal::before{background:var(--accent3)} .amber::before{background:var(--amber)} .blue::before{background:var(--blue)}
-.task-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
-.task-item:last-child{border-bottom:none}
-.task-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.task-check.done{background:var(--accent3);border-color:var(--accent3)}
-.task-body{flex:1;min-width:0}
-.task-text{font-size:14px;line-height:1.3}
-.task-text.done{text-decoration:line-through;color:var(--muted)}
-.task-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.task-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;flex-shrink:0}
-.tag-urgent{background:rgba(248,113,113,.15);color:var(--red)}
-.tag-normal{background:rgba(124,106,247,.15);color:var(--accent2)}
-.tag-done{background:rgba(52,211,153,.12);color:var(--green)}
-.tag-client{background:rgba(251,191,36,.12);color:var(--amber)}
-.pill-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px}
-.pill-tabs::-webkit-scrollbar{display:none}
-.pill{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;border:1px solid var(--border2);color:var(--muted);background:transparent}
-.pill.active{background:var(--accent);border-color:var(--accent);color:white}
-.inp,.sel,.textarea{
-  width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r);
-  padding:11px 14px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none
-}
-.textarea{resize:none;min-height:96px;line-height:1.5}
-.inp:focus,.sel:focus,.textarea:focus{border-color:var(--accent)}
-.btn{padding:11px 16px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--font-head);font-size:13px;font-weight:600;background:var(--accent);color:white;white-space:nowrap}
-.btn.outline{background:transparent;border:1px solid var(--border2);color:var(--text)}
-.btn.teal{background:var(--accent3);color:#0a0a0f}
-.btn.sm{padding:7px 12px;font-size:12px}
-.request-bubble{background:var(--bg4);border:1px solid var(--border2);border-radius:14px 14px 14px 4px;padding:10px 14px;margin-bottom:10px;max-width:85%}
-.req-from{font-size:11px;color:var(--muted);margin-bottom:4px}
-.req-text{font-size:14px;line-height:1.4}
-.req-time{font-size:11px;color:var(--muted);margin-top:4px}
-.my-bubble{background:rgba(124,106,247,.2);border:1px solid rgba(124,106,247,.3);border-radius:14px 14px 4px 14px;margin-left:auto}
-.client-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r2);padding:16px;margin-bottom:12px;position:relative;overflow:hidden}
-.client-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.c0::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
-.c1::before{background:linear-gradient(90deg,var(--accent3),var(--blue))}
-.c2::before{background:linear-gradient(90deg,var(--amber),var(--pink))}
-.c3::before{background:linear-gradient(90deg,var(--blue),var(--accent3))}
-.client-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.client-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:16px;font-weight:700;flex-shrink:0}
-.av0{background:rgba(124,106,247,.2);color:var(--accent2)}
-.av1{background:rgba(56,217,169,.2);color:var(--accent3)}
-.av2{background:rgba(251,191,36,.2);color:var(--amber)}
-.av3{background:rgba(96,165,250,.2);color:var(--blue)}
-.client-name{font-family:var(--font-head);font-size:16px;font-weight:600}
-.client-role{font-size:12px;color:var(--muted)}
-.client-actions{display:flex;gap:8px;flex-wrap:wrap}
-.client-tasks-mini{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
-.mini-task{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px}
-.mini-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.dot-pending{background:var(--amber)} .dot-done{background:var(--green)}
-.wa-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r);background:rgba(37,211,102,.15);border:1px solid rgba(37,211,102,.3);color:#25d166;font-size:12px;font-weight:500;text-decoration:none}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow-x: hidden; }
+
+.login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+.login-mark { width: 56px; height: 56px; border-radius: 16px; background: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.login-mark svg { width: 28px; height: 28px; color: white; }
+.login-title { font-family: var(--font-head); font-size: 28px; font-weight: 500; text-align: center; margin-bottom: 6px; }
+.login-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 36px; }
+.login-box { width: 100%; max-width: 380px; }
+.inp { width: 100%; padding: 13px 16px; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r); font-family: var(--font-body); font-size: 15px; outline: none; margin-bottom: 10px; }
+.login-btn { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: var(--r); font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+.login-btn:active { opacity: 0.8; }
+
+.app { display: none; flex-direction: column; height: 100vh; height: 100dvh; }
+.app.visible { display: flex; }
+.portal-header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+.header-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; background: var(--accent-light); color: var(--accent); }
+.portal-content { flex: 1; overflow-y: auto; padding-bottom: 100px; }
+.page { display: none; padding: 18px 16px; }
+.page.active { display: block; animation: fadeUp 0.3s ease; }
+
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 12px; border: none; background: transparent; color: var(--muted); font-size: 11px; font-weight: 600; }
+.nav-btn.active { color: var(--accent2); }
+
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 12px; }
+.card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 12px; }
+.welcome-banner { background: var(--accent); border-radius: var(--r2); padding: 20px; color: white; margin-bottom: 14px; }
+.status-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.status-box { background: var(--bg3); border-radius: var(--r); padding: 12px; text-align: center; }
+.status-num { font-family: var(--font-head); font-size: 22px; font-weight: 500; }
+
+.task-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.task-status { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--border2); margin-top: 2px; }
+.ts-done { background: var(--accent2); border-color: var(--accent2); position: relative; }
+.ts-done::after { content: '✓'; color: white; font-size: 10px; position: absolute; left: 3px; top: 0px; }
+.task-name { font-size: 14px; font-weight: 500; }
+.task-name.done { text-decoration: line-through; color: var(--muted); }
+
+.textarea { width: 100%; padding: 12px; border: 1px solid var(--border2); border-radius: var(--r); min-height: 100px; font-family: inherit; resize: none; margin-bottom: 12px; }
+.success-msg { display: none; background: var(--accent-light); color: var(--accent2); padding: 10px; border-radius: var(--r); text-align: center; font-size: 13px; margin-top: 10px; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <div class="topbar-left">
-      <div class="app-logo">VA <span>Portal</span></div>
-      <div class="topbar-date" id="topbar-date"></div>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-mark">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+  </div>
+  <div class="login-title">Client Portal</div>
+  <div class="login-sub">Enter your access code</div>
+  <div class="login-box">
+    <input class="inp" type="password" id="access-code" placeholder="Access Code">
+    <button class="login-btn" onclick="handleLogin()">Sign in</button>
+    <div id="login-error" style="color:var(--red); font-size:12px; margin-top:10px; display:none; text-align:center;">Invalid access code.</div>
+  </div>
+</div>
+
+<div id="portal-app" class="app">
+  <div class="portal-header">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div class="header-avatar" id="hdr-avatar">?</div>
+      <div>
+        <div class="header-name" id="hdr-name" style="font-size:14px; font-weight:600;">Client</div>
+        <div style="font-size:10px; color:var(--muted)">Active Session</div>
+      </div>
     </div>
-    <button class="btn-icon" onclick="toggleMode()">
-      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 12h18"/><path d="M12 3v18"/></svg>
-    </button>
+    <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:12px; font-weight:600;">Logout</button>
   </div>
 
-  <div class="content" id="content">
-    <div class="page active" id="page-dash">
-      <div class="stat-grid">
-        <div class="stat-box purple"><div class="stat-num" id="sd-tasks">0</div><div class="stat-lbl">Tasks today</div></div>
-        <div class="stat-box teal"><div class="stat-num" id="sd-done">0</div><div class="stat-lbl">Completed</div></div>
-        <div class="stat-box amber"><div class="stat-num" id="sd-events">0</div><div class="stat-lbl">Events</div></div>
-        <div class="stat-box blue"><div class="stat-num" id="sd-reqs">0</div><div class="stat-lbl">Client requests</div></div>
+  <div class="portal-content">
+    <div class="page active" id="pp-home">
+      <div class="welcome-banner">
+        <div style="font-size:12px; opacity:0.8;">Welcome back,</div>
+        <h2 id="wb-name" style="font-family:var(--font-head); font-weight:500;">User</h2>
       </div>
-
-      <div class="card">
-        <div class="card-title">Client requests <span class="badge" id="req-badge"></span></div>
-        <div id="dash-requests"></div>
+      <div class="status-row">
+        <div class="status-box"><div class="status-num" id="st-pending" style="color:var(--gold)">0</div><div style="font-size:10px;">Pending</div></div>
+        <div class="status-box"><div class="status-num" id="st-done" style="color:var(--accent2)">0</div><div style="font-size:10px;">Done</div></div>
+        <div class="status-box"><div class="status-num" id="st-total" style="color:var(--blue)">0</div><div style="font-size:10px;">Total</div></div>
       </div>
-
       <div class="card">
-        <div class="card-title">Today's tasks</div>
-        <div id="dash-tasks"></div>
+        <div class="card-label">Priority Tasks</div>
+        <div id="home-tasks"></div>
       </div>
     </div>
 
-    <div class="page" id="page-tasks">
-      <div class="pill-tabs">
-        <div class="pill active" onclick="filterTasks('all',this)">All</div>
-        <div class="pill" onclick="filterTasks('mine',this)">Mine</div>
-        <div class="pill" onclick="filterTasks('client',this)">Client requests</div>
-        <div class="pill" onclick="filterTasks('urgent',this)">Urgent</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Add task</div>
-        <div class="input-row" style="display:flex;gap:8px;margin-bottom:12px">
-          <input class="inp" id="task-inp" placeholder="Add a task..." onkeydown="if(event.key==='Enter')addTask()">
-          <button class="btn" onclick="addTask()">Add</button>
-        </div>
-        <div id="task-list-full"></div>
-      </div>
+    <div class="page" id="pp-tasks">
+      <h3 style="font-family:var(--font-head); margin-bottom:15px;">Your Tasks</h3>
+      <div id="full-task-list"></div>
     </div>
 
-    <div class="page" id="page-clients">
-      <div class="pill-tabs">
-        <div class="pill active" onclick="showClientTab('overview',this)">Overview</div>
-        <div class="pill" onclick="showClientTab('requests',this)">Requests</div>
-        <div class="pill" onclick="showClientTab('notify',this)">Notify</div>
-      </div>
-
-      <div id="client-tab-overview">
-        <div id="client-cards"></div>
-      </div>
-
-      <div id="client-tab-requests" style="display:none">
-        <div class="card">
-          <div class="card-title">Incoming client requests</div>
-          <div id="all-requests"></div>
-        </div>
-      </div>
-
-      <div id="client-tab-notify" style="display:none">
-        <div class="card">
-          <div class="card-title">Send WhatsApp notification</div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Select client</div>
-            <select class="sel" id="wa-client"></select>
-          </div>
-          <div style="margin-bottom:10px">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Message</div>
-            <textarea class="textarea" id="wa-msg">Hi! Your tasks for today are ready. Please review and let me know if you have any changes. Thank you!</textarea>
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-            <button class="pill" onclick="setWAMsg('Hi! Your daily task update is ready. All on track for today ✅')">Daily update</button>
-            <button class="pill" onclick="setWAMsg('Reminder: We have a scheduled meeting today. Please confirm your availability.')">Meeting reminder</button>
-            <button class="pill" onclick="setWAMsg('Your content drafts are ready for review. Please check and send feedback!')">Content ready</button>
-            <button class="pill" onclick="setWAMsg('Invoice sent! Please check your email and let me know if you have questions.')">Invoice sent</button>
-          </div>
-          <button class="btn" style="width:100%" onclick="sendWhatsApp()">Open in WhatsApp</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="page" id="page-content">
+    <div class="page" id="pp-requests">
+      <h3 style="font-family:var(--font-head); margin-bottom:15px;">New Request</h3>
       <div class="card">
-        <div class="card-title">Content Studio</div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Platform</div>
-          <select class="sel" id="content-platform">
-            <option>Facebook</option><option>Instagram</option><option>LinkedIn</option><option>Twitter/X</option>
-          </select>
-        </div>
-        <div style="margin-bottom:10px">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Topic or brief</div>
-          <textarea class="textarea" id="content-brief" placeholder="Write a post brief..."></textarea>
-        </div>
-        <button class="btn teal" style="width:100%" onclick="generateContent()">Generate placeholder post</button>
-        <div id="content-output" style="margin-top:12px"></div>
+        <div class="card-label">What do you need help with?</div>
+        <input class="inp" id="req-type-inp" placeholder="e.g. Email Draft, Research">
+        <textarea class="textarea" id="req-desc" placeholder="Provide details for your VA..."></textarea>
+        <button class="login-btn" onclick="submitRequest()">Send Request</button>
+        <div class="success-msg" id="req-success">✓ Request sent to your VA!</div>
       </div>
     </div>
   </div>
 
   <nav class="bottom-nav">
-    <button class="nav-btn active" id="nb-dash" onclick="goTo('dash')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span class="nav-label">Home</span>
-    </button>
-    <button class="nav-btn" id="nb-tasks" onclick="goTo('tasks')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      <span class="nav-label">Tasks</span>
-    </button>
-    <button class="nav-btn" id="nb-clients" onclick="goTo('clients')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="nav-label">Clients</span>
-    </button>
-    <button class="nav-btn" id="nb-content" onclick="goTo('content')">
-      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="nav-label">Content</span>
-    </button>
+    <button class="nav-btn active" id="btn-home" onclick="goPortalPage('home')">HOME</button>
+    <button class="nav-btn" id="btn-tasks" onclick="goPortalPage('tasks')">TASKS</button>
+    <button class="nav-btn" id="btn-requests" onclick="goPortalPage('requests')">REQUEST</button>
   </nav>
 </div>
 
 <script>
-const clients = [
-  { id:'natalie', name:'Natalie', role:'Client 01', phone:'639xxxxxxxxx', avatar:'NA' },
-  { id:'tabskie', name:'Tabskie', role:'Client 02', phone:'639xxxxxxxxx', avatar:'TB' },
-  { id:'tenacity', name:'Tenacity', role:'Client 03', phone:'639xxxxxxxxx', avatar:'TE' },
-  { id:'other', name:'Other', role:'Next client (editable)', phone:'639xxxxxxxxx', avatar:'OT', editable:true }
-];
+// --- CONFIGURATION ---
+// I updated this to use your real project URL and Anon Key correctly
+const SUPABASE_URL = 'https://vpflotnvkwwpvqspbksu.supabase.co'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZmxvdG52a3d3cHZxc3Bia3N1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2NjExNzEsImV4cCI6MjA5MzIzNzE3MX0.XFH6QY3SFnrFWp3WVGYy7LTWRUtAhL64KxCr8DjLvHk';
 
-let tasks = [
-  { id:1, text:'Draft Facebook post – Natalie', done:false, tag:'urgent', client:'Natalie' },
-  { id:2, text:'Send weekly invoice', done:false, tag:'urgent', client:null },
-  { id:3, text:'Update CRM contacts', done:true, tag:'normal', client:null },
-  { id:4, text:'Write 3 IG captions – Tabskie', done:false, tag:'client', client:'Tabskie' },
-  { id:5, text:'Prepare onboarding doc – Tenacity', done:false, tag:'normal', client:'Tenacity' }
-];
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let requests = [
-  { from:'Natalie', text:'Can you draft the Facebook post for the new listing?', time:'Today, 9:41 AM' },
-  { from:'Tabskie', text:'Please schedule 3 IG posts for this week.', time:'Today, 8:15 AM' },
-  { from:'Tenacity', text:'Can you check if the email campaign went out yesterday?', time:'Yesterday, 5:30 PM' }
-];
+let currentUser = null;
 
-let events = [
-  { title:'Client standup – Natalie', when:'Today · 9:00 AM', client:'Natalie', color:'var(--accent2)' },
-  { title:'Content review – Tabskie', when:'Today · 2:00 PM', client:'Tabskie', color:'var(--accent3)' },
-  { title:'Invoice follow-up', when:'Today · 4:30 PM', client:null, color:'var(--amber)' }
-];
-
-let mode = 'va';
-let taskFilter = 'all';
-
-function setDate() {
-  const now = new Date();
-  document.getElementById('topbar-date').textContent = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+// --- AUTH LOGIC ---
+async function handleLogin() {
+  const code = document.getElementById('access-code').value.trim().toLowerCase();
+  
+  // Replace the ID below with a real User UID from your Supabase Auth tab
+  if(code === 'client1') {
+    currentUser = { 
+      id: 'PASTE_REAL_USER_UID_HERE', 
+      name: 'Natalie' 
+    };
+    initPortal();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
 }
-function goTo(page) {
+
+function logout() {
+  location.reload();
+}
+
+async function initPortal() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('portal-app').classList.add('visible');
+  document.getElementById('wb-name').textContent = currentUser.name;
+  document.getElementById('hdr-name').textContent = currentUser.name;
+  document.getElementById('hdr-avatar').textContent = currentUser.name.charAt(0);
+  
+  fetchTasks();
+}
+
+// --- DATA FETCHING ---
+async function fetchTasks() {
+  const { data: tasks, error } = await _supabase
+    .from('tasks')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error:', error);
+  } else {
+    renderTasksUI(tasks);
+  }
+}
+
+async function submitRequest() {
+  const type = document.getElementById('req-type-inp').value;
+  const desc = document.getElementById('req-desc').value;
+
+  if(!type || !desc) return alert("Please fill in all fields.");
+
+  const { error } = await _supabase
+    .from('requests')
+    .insert([{ type, description: desc, user_id: currentUser.id }]);
+
+  if (!error) {
+    const msg = document.getElementById('req-success');
+    msg.style.display = 'block';
+    setTimeout(() => msg.style.display = 'none', 3000);
+    document.getElementById('req-type-inp').value = '';
+    document.getElementById('req-desc').value = '';
+  } else {
+    alert("Error: " + error.message);
+  }
+}
+
+// --- UI RENDERING ---
+function renderTasksUI(tasks) {
+  const container = document.getElementById('full-task-list');
+  const homeContainer = document.getElementById('home-tasks');
+  
+  if (!tasks || tasks.length === 0) {
+    const empty = '<div style="font-size:12px; color:var(--muted); padding:10px;">No tasks assigned.</div>';
+    container.innerHTML = empty;
+    homeContainer.innerHTML = empty;
+    return;
+  }
+
+  const html = tasks.map(t => `
+    <div class="task-item">
+      <div class="task-status ${t.status === 'done' ? 'ts-done' : ''}"></div>
+      <div class="task-body">
+        <div class="task-name ${t.status === 'done' ? 'done' : ''}">${t.name}</div>
+        <div style="font-size:10px; color:var(--muted); margin-top:2px;">Due: ${t.due_date || 'N/A'}</div>
+      </div>
+    </div>
+  `).join('');
+
+  container.innerHTML = `<div class="card">${html}</div>`;
+  homeContainer.innerHTML = html.slice(0, 3); 
+
+  document.getElementById('st-total').textContent = tasks.length;
+  document.getElementById('st-done').textContent = tasks.filter(t => t.status === 'done').length;
+  document.getElementById('st-pending').textContent = tasks.filter(t => t.status !== 'done').length;
+}
+
+function goPortalPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nb-' + page).classList.add('active');
-  renderAll();
+  document.getElementById('pp-' + page).classList.add('active');
+  document.getElementById('btn-' + page).classList.add('active');
 }
-function showClientTab(tab, el) {
-  ['overview','requests','notify'].forEach(t => document.getElementById('client-tab-' + t).style.display = (t===tab ? 'block' : 'none'));
-  document.querySelectorAll('#page-clients .pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  renderAll();
-}
-function toggleMode() {
-  mode = mode === 'va' ? 'client' : 'va';
-  alert('Mode switched to ' + mode.toUpperCase() + '. Connect this to real login later.');
-}
-function taskHTML(t) {
-  return `
-    <div class="task-item">
-      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})">
-        ${t.done ? '<svg width="10" height="10" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 12 12"><polyline points="2 6 5 9 10 3"/></svg>' : ''}
-      </div>
-      <div class="task-body">
-        <div class="task-text ${t.done ? 'done' : ''}">${t.text}</div>
-        ${t.client ? `<div class="task-meta">Client: ${t.client}</div>` : ''}
-      </div>
-      <div class="task-tag ${t.done ? 'tag-done' : t.tag === 'urgent' ? 'tag-urgent' : t.tag === 'client' ? 'tag-client' : 'tag-normal'}">${t.done ? 'done' : t.tag}</div>
-    </div>`;
-}
-function toggleTask(id) {
-  const t = tasks.find(x => x.id === id);
-  if (t) t.done = !t.done;
-  renderAll();
-}
-function addTask() {
-  const inp = document.getElementById('task-inp');
-  const text = inp.value.trim();
-  if (!text) return;
-  tasks.unshift({ id: Date.now(), text, done:false, tag:'normal', client:null });
-  inp.value = '';
-  renderAll();
-}
-function filterTasks(f, el) {
-  taskFilter = f;
-  document.querySelectorAll('#page-tasks .pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  renderAll();
-}
-function renderTasks() {
-  let list = tasks;
-  if (taskFilter === 'mine') list = tasks.filter(t => !t.client);
-  if (taskFilter === 'client') list = tasks.filter(t => t.client);
-  if (taskFilter === 'urgent') list = tasks.filter(t => t.tag === 'urgent');
-  document.getElementById('task-list-full').innerHTML = list.map(taskHTML).join('');
-}
-function renderDashboard() {
-  document.getElementById('sd-tasks').textContent = tasks.length;
-  document.getElementById('sd-done').textContent = tasks.filter(t => t.done).length;
-  document.getElementById('sd-events').textContent = events.length;
-  document.getElementById('sd-reqs').textContent = requests.length;
-  document.getElementById('req-badge').textContent = requests.length + ' new';
-  document.getElementById('dash-requests').innerHTML = requests.slice(0,2).map(r => `
-    <div class="request-bubble">
-      <div class="req-from">${r.from} · Client</div>
-      <div class="req-text">${r.text}</div>
-      <div class="req-time">${r.time}</div>
-    </div>
-  `).join('');
-  document.getElementById('dash-tasks').innerHTML = tasks.slice(0,5).map(taskHTML).join('');
-}
-function renderClients() {
-  const el = document.getElementById('client-cards');
-  el.innerHTML = clients.map((c, i) => {
-    const initials = c.avatar;
-    const mini = tasks.filter(t => t.client === c.name).slice(0,3);
-    return `
-      <div class="client-card c${i}">
-        <div class="client-header">
-          <div class="client-avatar av${i}">${initials}</div>
-          <div>
-            <div class="client-name">${c.editable ? `<input class="inp" style="padding:6px 10px;font-size:15px" value="${c.name}" oninput="clients[${i}].name=this.value">` : c.name}</div>
-            <div class="client-role">${c.role}</div>
-          </div>
-        </div>
-        <div class="client-tasks-mini">
-          ${mini.length ? mini.map(t => `
-            <div class="mini-task">
-              <div class="mini-dot ${t.done ? 'dot-done' : 'dot-pending'}"></div>
-              <span>${t.text}</span>
-            </div>
-          `).join('') : '<div style="font-size:13px;color:var(--muted)">No tasks yet.</div>'}
-        </div>
-        <div class="client-actions" style="margin-top:12px">
-          <a class="wa-btn" href="https://wa.me/${c.phone}?text=${encodeURIComponent('Hi ' + c.name + '! Your update is ready.')}\" target="_blank">WhatsApp</a>
-        </div>
-      </div>
-    `;
-  }).join('');
-  document.getElementById('wa-client').innerHTML = clients.map((c, i) => `<option value="${i}">${c.name}</option>`).join('');
-  document.getElementById('all-requests').innerHTML = requests.map(r => `
-    <div class="request-bubble">
-      <div class="req-from">${r.from}</div>
-      <div class="req-text">${r.text}</div>
-      <div class="req-time">${r.time}</div>
-    </div>
-  `).join('');
-}
-function setWAMsg(msg){ document.getElementById('wa-msg').value = msg; }
-function sendWhatsApp() {
-  const idx = parseInt(document.getElementById('wa-client').value, 10);
-  const msg = document.getElementById('wa-msg').value.trim();
-  window.open(`https://wa.me/${clients[idx].phone}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-function renderContent() {
-  document.getElementById('content-output').innerHTML = `
-    <div class="card" style="background:var(--bg4)">
-      <div class="card-title">Draft preview</div>
-      <div style="font-size:14px;line-height:1.6;white-space:pre-wrap">
-        ${document.getElementById('content-platform').value}: ${document.getElementById('content-brief').value || 'Your draft will appear here.'}
-      </div>
-    </div>
-  `;
-}
-function renderAll(){
-  renderTasks();
-  renderDashboard();
-  renderClients();
-  renderContent();
-}
-function generateContent(){ renderContent(); }
-setDate();
-renderAll();
 </script>
 </body>
 </html>
